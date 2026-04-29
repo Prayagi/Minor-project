@@ -372,5 +372,5 @@ Content-Type: application/json
 ---
 
 ## 👥 Team
-Prayagi sahajwani,Sanskrati Kachole Sheetal narwariya, Sejal Soni
+Prayagi sahajwani,Sanskrati Kachole, Sheetal narwariya, Sejal Soni
 **Minor Project — Aqua Forecast**
