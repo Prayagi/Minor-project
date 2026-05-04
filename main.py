@@ -5,9 +5,11 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI(title="Aqua Forecast API")
-
+app.mount("/static", StaticFiles(directory="public"), name="static")
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
@@ -90,7 +92,7 @@ class CapacityInput(BaseModel):
 # Routes
 # -------------------------------
 
-@app.get("/")
+@app.get("/status")
 def home():
     return {
         "status": "API running 🚀",
@@ -101,6 +103,10 @@ def home():
         }
     }
 
+
+@app.get('/')
+def read_root():
+    return FileResponse('public/HTML_File/menu.html')
 # --- Water Prediction ---
 @app.post("/predict_water")
 async def predict_water(data: WaterDemandInput):
