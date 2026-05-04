@@ -134,7 +134,7 @@ def predict_sector_risk_page():
 @app.post("/predict_water")
 async def predict_water(data: WaterDemandInput):
     try:
-        if not water_model or not water_cols:
+        if water_model is None or water_cols is None:
             return {"error": "Water model or feature columns not loaded"}
 
         # Prepare DataFrame using model dict representation
@@ -156,7 +156,7 @@ async def predict_water(data: WaterDemandInput):
 @app.post("/predict_sector")
 async def predict_sector(data: SectorRiskInput):
     try:
-        if not sector_model:
+        if sector_model is None:
             return {"error": "Sector model not loaded"}
 
         # Safe feature extraction based on predefined order
@@ -187,7 +187,7 @@ async def predict_sector(data: SectorRiskInput):
 @app.post("/predict_capacity")
 async def predict_capacity(data: CapacityInput):
     try:
-        if not capacity_model:
+        if capacity_model is None:
             return {"error": "Capacity model not loaded"}
 
         # Safe feature extraction
