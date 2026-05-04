@@ -42,6 +42,19 @@ def load_model(path):
         print(f"❌ Error loading {abs_path}: {e}")
         return None
 
+def join_chunks(file_path):
+    parts = sorted([f for f in os.listdir(os.path.dirname(file_path)) if f.startswith(os.path.basename(file_path) + ".part")])
+    if not parts:
+        return file_path
+    
+    print(f"🧩 Recombining {len(parts)} chunks for {file_path}...")
+    with open(file_path, 'wb') as output_file:
+        for part in parts:
+            part_path = os.path.join(os.path.dirname(file_path), part)
+            with open(part_path, 'rb') as input_file:
+                output_file.write(input_file.read())
+    return file_path
+
 # -------------------------------
 # Paths & Model Loading
 # -------------------------------
@@ -60,6 +73,9 @@ capacity_model_path = os.path.join(BASE_DIR, "capacity_model", "capacity_model.p
 water_model = load_model(water_model_path)
 water_cols = load_model(water_cols_path)
 sector_model = load_model(sector_model_path)
+
+# Recombine and load large capacity model
+join_chunks(capacity_model_path)
 capacity_model = load_model(capacity_model_path)
 
 # Feature Definitions (for ordering)
