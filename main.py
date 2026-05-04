@@ -1,88 +1,179 @@
-from fastapi import FastAPI, Request
-import pickle
+import joblib
+import pandas as pd
 import numpy as np
 import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-app = FastAPI()
+app = FastAPI(title="Aqua Forecast API")
+
+# Enable CORS for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -------------------------------
-# Helper: safe model loading
+# Helper: Safe Model Loading
 # -------------------------------
 def load_model(path):
     try:
-        return pickle.load(open(path, "rb"))
+        if os.path.exists(path):
+            model = joblib.load(path)
+            print(f"✅ Loaded model: {path}")
+            return model
+        else:
+            print(f"⚠️ Model NOT found: {path}")
+            return None
     except Exception as e:
-        print(f"Error loading model from {path}: {e}")
+        print(f"❌ Error loading {path}: {e}")
         return None
 
 # -------------------------------
-# Load your models (UPDATE PATHS)
+# Paths & Model Loading
 # -------------------------------
+BASE_DIR = os.path.join(os.getcwd(), "project_model")
 
-# ⚠️ IMPORTANT: Fix folder names if needed (no spaces ideally)
+# Water Model
+water_model_path = os.path.join(BASE_DIR, "WaterDemandPrediction_Model", "water_model.pkl")
+water_cols_path = os.path.join(BASE_DIR, "WaterDemandPrediction_Model", "columns.pkl")
 
-water_model_path = "project Model/WaterDemandPrediction_Model/water_model.pkl"
-sector_model_path = "project Model/SectorRiskPrediction_Model/sector_model.pkl"
-capacity_model_path = "project Model/CapacityPrediction_Model/capacity_model.pkl"
+# Sector Model
+sector_model_path = os.path.join(BASE_DIR, "sector_model", "sector_model.pkl")
+
+# Capacity Model
+capacity_model_path = os.path.join(BASE_DIR, "capacity_model", "capacity_model.pkl")
 
 water_model = load_model(water_model_path)
+water_cols = load_model(water_cols_path)
 sector_model = load_model(sector_model_path)
 capacity_model = load_model(capacity_model_path)
 
+# Feature Definitions (for ordering)
+SECTOR_FEATURES = ["population", "capacity", "inflow", "outflow", "reservoirlevel"]
+CAPACITY_FEATURES = ["Rainfall_mm", "Inflow_cumecs", "Outflow_cumecs", "Runoff_Factor"]
+
 # -------------------------------
-# Root route
+# Pydantic Schemas
 # -------------------------------
+class WaterDemandInput(BaseModel):
+    Temperature: float
+    Rainfall: float
+    Population: float
+    Reservoir_Level: float
+    Water_Tariff: float
+    Holiday: int = 0
+    lag_1: float
+    lag_7: float
+    City: str
+    Season: str
+
+class SectorRiskInput(BaseModel):
+    population: float
+    capacity: float
+    inflow: float
+    outflow: float
+    reservoirlevel: float
+
+class CapacityInput(BaseModel):
+    Rainfall_mm: float
+    Inflow_cumecs: float
+    Outflow_cumecs: float
+    Runoff_Factor: float
+
+
+# -------------------------------
+# Routes
+# -------------------------------
+
 @app.get("/")
 def home():
-    return {"status": "API running 🚀"}
+    return {
+        "status": "API running 🚀",
+        "models_loaded": {
+            "water": water_model is not None,
+            "sector": sector_model is not None,
+            "capacity": capacity_model is not None
+        }
+    }
 
-# -------------------------------
-# Water Prediction
-# -------------------------------
+# --- Water Prediction ---
 @app.post("/predict_water")
-async def predict_water(request: Request):
-    data = await request.json()
-
+async def predict_water(data: WaterDemandInput):
     try:
-        features = list(data.values())
-        features = np.array(features).reshape(1, -1)
+        if not water_model or not water_cols:
+            return {"error": "Water model or feature columns not loaded"}
 
-        prediction = water_model.predict(features)
-        return {"prediction": float(prediction[0])}
+        # Prepare DataFrame using model dict representation
+        df = pd.DataFrame([data.model_dump()])
+        
+        # Handle dummies (One-hot encoding for City, Season, etc.)
+        df = pd.get_dummies(df)
+        
+        # Reindex to match training columns
+        df = df.reindex(columns=water_cols, fill_value=0)
+
+        prediction = water_model.predict(df)[0]
+        return {"prediction": int(prediction)}
 
     except Exception as e:
         return {"error": str(e)}
 
-# -------------------------------
-# Sector Risk Prediction
-# -------------------------------
+# --- Sector Risk Prediction ---
 @app.post("/predict_sector")
-async def predict_sector(request: Request):
-    data = await request.json()
-
+async def predict_sector(data: SectorRiskInput):
     try:
-        features = list(data.values())
-        features = np.array(features).reshape(1, -1)
+        if not sector_model:
+            return {"error": "Sector model not loaded"}
 
-        prediction = sector_model.predict(features)
-        return {"prediction": float(prediction[0])}
+        # Safe feature extraction based on predefined order
+        input_data = pd.DataFrame([{
+            f: getattr(data, f, 0) for f in SECTOR_FEATURES
+        }])
+
+        prediction = sector_model.predict(input_data)[0]
+        
+        # Risk Logic
+        capacity = data.capacity or 1
+        risk_ratio = prediction / capacity
+        
+        if risk_ratio > 0.8: risk_level = "High Risk"
+        elif risk_ratio > 0.5: risk_level = "Medium Risk"
+        else: risk_level = "Low Risk"
+
+        return {
+            "predicted_demand": round(float(prediction), 2),
+            "risk_level": risk_level,
+            "risk_ratio": round(float(risk_ratio), 2)
+        }
 
     except Exception as e:
         return {"error": str(e)}
 
-# -------------------------------
-# Capacity Prediction
-# -------------------------------
+# --- Capacity Prediction ---
 @app.post("/predict_capacity")
-async def predict_capacity(request: Request):
-    data = await request.json()
-
+async def predict_capacity(data: CapacityInput):
     try:
-        features = list(data.values())
-        features = np.array(features).reshape(1, -1)
+        if not capacity_model:
+            return {"error": "Capacity model not loaded"}
 
-        prediction = capacity_model.predict(features)
-        return {"prediction": float(prediction[0])}
+        # Safe feature extraction
+        input_data = pd.DataFrame([{
+            f: getattr(data, f, 0) for f in CAPACITY_FEATURES
+        }])
+
+        prediction = capacity_model.predict(input_data)[0]
+        prediction = max(0, min(100, float(prediction))) # Clamp 0-100%
+
+        return {"predicted_capacity_percentage": round(prediction, 2)}
 
     except Exception as e:
         return {"error": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8080)
