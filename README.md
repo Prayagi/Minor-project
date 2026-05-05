@@ -1,376 +1,272 @@
 # 💧 Aqua Forecast - AI-Powered Water Resource Management System
 
-> A full-stack web application that leverages Machine Learning to predict water demand, reservoir capacity, and sector-wise risk assessment - empowering sustainable water management decisions.
+> A comprehensive, full-stack web application leveraging Machine Learning to predict water demand, forecast reservoir capacity, and perform sector-wise risk assessments. Designed to empower urban planners, researchers, and local authorities with proactive, data-driven water management decisions.
 
 ---
 
 ## 📋 Table of Contents
 
-- [About the Project](#about-the-project)
-- [Aim](#aim)
-- [Objectives](#objectives)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [ML Models Overview](#ml-models-overview)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Running the Application](#running-the-application)
-- [Usage Guide](#usage-guide)
-- [API Endpoints](#api-endpoints)
-- [Screenshots](#screenshots)
-- [Team](#team)
-- [License](#license)
+- [Overview & Purpose](#-overview--purpose)
+- [Aim & Objectives](#-aim--objectives)
+- [Key Features](#-key-features)
+- [Tech Stack & Architecture](#-tech-stack--architecture)
+- [Project Structure](#-project-structure)
+- [Machine Learning Models Details](#-machine-learning-models-details)
+- [How to Access & Run Locally](#-how-to-access--run-locally)
+- [Usage Guide](#-usage-guide)
+- [API Documentation](#-api-documentation)
+- [Troubleshooting](#-troubleshooting)
+- [Team](#-team)
 
 ---
 
-## 📖 About the Project
+## 📖 Overview & Purpose
 
-**Aqua Forecast** is a Minor Project that combines a modern web interface with multiple Machine Learning models to provide intelligent predictions related to water resource management. The system helps urban planners, water authorities, and researchers make data-driven decisions about water supply, reservoir management, and sector-level risk evaluation.
+**Aqua Forecast** was developed as a Minor Project to address the growing challenges of urban water management. As cities expand and climate change disrupts traditional weather patterns, relying on historical averages for water supply and demand is no longer sufficient. 
 
-The application features a sleek ocean-themed UI with dynamic rain animations, glassmorphism design elements, and three core prediction modules , each powered by a dedicated ML model running as a separate Flask microservice.
+**The Purpose:** 
+The core purpose of this project is to bridge the gap between complex machine learning algorithms and practical, day-to-day urban planning. By taking into account real-time and historical data—such as population density, temperature, rainfall, and reservoir levels—Aqua Forecast provides actionable insights. 
 
----
-
-## 🎯 Aim
-
-To develop an AI-powered water resource management system that provides accurate predictions for water demand, reservoir capacity, and sector-wise risk assessment, enabling proactive and sustainable water management in urban areas.
-
----
-
-## 📌 Objectives
-
-1. **Water Demand Prediction** — Forecast water demand based on city, season, temperature, rainfall, population, reservoir level, water tariff, and historical demand patterns.
-2. **Reservoir Capacity Prediction** — Predict the capacity percentage of a reservoir based on rainfall, inflow, outflow, and runoff factor.
-3. **Sector-Wise Risk Assessment** — Assess the water supply risk level (Low / Medium / High) for a sector based on population, capacity, inflow, outflow, and reservoir level.
-4. **User-Friendly Interface** — Provide an intuitive, visually appealing web interface for non-technical users to interact with the ML models.
+**Who is this for?**
+- **Urban Planners & Municipalities:** To foresee potential water shortages in specific sectors and allocate resources efficiently.
+- **Water Treatment Authorities:** To estimate reservoir capacities based on rainfall and runoff factors, ensuring safe operational levels.
+- **Environmental Researchers:** To study the correlations between climate conditions and urban water consumption patterns.
 
 ---
 
-## 🛠️ Tech Stack
+## 🎯 Aim & Objectives
 
-### Frontend
+### Aim
+To engineer an accessible, highly accurate, and AI-powered water resource management ecosystem that provides real-time predictions for water demand, reservoir storage capacity, and sector-specific risk levels, ultimately fostering sustainable water distribution.
+
+### Core Objectives
+1. **Intelligent Water Demand Forecasting:** Predict accurate water consumption needs dynamically by evaluating factors like seasonal changes, temperature variations, city demographics, and historical trends.
+2. **Reservoir Capacity Estimation:** Calculate the expected capacity percentage of local reservoirs based on rainfall metrics, inflow/outflow dynamics, and regional runoff factors.
+3. **Sector-Wise Risk Evaluation:** Identify vulnerable urban sectors and assign a risk classification (Low / Medium / High) based on supply-demand gaps and current storage levels.
+4. **Seamless User Experience:** Deliver an intuitive, aesthetically pleasing (glassmorphism & ocean-themed) web interface that requires zero technical ML expertise to operate.
+5. **Unified API Infrastructure:** Centralize all machine learning predictions through a single, high-performance FastAPI backend.
+
+---
+
+## 🌟 Key Features
+
+- **Unified FastAPI Backend:** Previously a multi-service architecture, now seamlessly integrated into a single, high-concurrency API server.
+- **Large Model Handling:** Implements automatic chunk-recombination for massive ML models (e.g., bypassing GitHub's 100MB LFS limits natively).
+- **Responsive Web Design:** Features a premium glassmorphism aesthetic with dynamic, animated weather/rain elements for an immersive user experience.
+- **Real-Time Inference:** Instantaneous predictions powered by serialized `scikit-learn` models (`.pkl`).
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+### Frontend & Web Interface
 | Technology | Purpose |
 |---|---|
-| **HTML5** | Page structure & semantic markup |
-| **CSS3** | Styling, glassmorphism, animations |
-| **JavaScript (Vanilla)** | Client-side logic, rain animations, API calls |
-| **EJS** | Server-side templating for dynamic pages |
-| **Google Fonts** | Cinzel & Raleway typography |
+| **HTML5 / CSS3** | Structural layout and premium glassmorphism styling |
+| **JavaScript (Vanilla)** | Client-side logic, routing logic, and dynamic DOM animations |
 
-### Backend
+### Backend & API Architecture
 | Technology | Purpose |
 |---|---|
-| **Node.js** | Web server runtime |
-| **Express.js v5** | Web framework for routing & static file serving |
-| **Flask** | Python microservices for ML model serving |
-| **Flask-CORS** | Cross-Origin Resource Sharing for API communication |
+| **FastAPI** | High-performance, async-ready Python web framework |
+| **Uvicorn** | ASGI server for handling concurrent HTTP requests |
+| **Pydantic** | Strict data validation and settings management for API payloads |
 
-### Machine Learning
+### Machine Learning & Data Processing
 | Technology | Purpose |
 |---|---|
-| **scikit-learn** | RandomForestRegressor models |
-| **pandas** | Data manipulation & preprocessing |
-| **joblib** | Model serialization (.pkl files) |
-| **NumPy** | Numerical computations |
+| **scikit-learn** | Model training and inference (RandomForestRegressor) |
+| **pandas / NumPy** | Complex data manipulation, feature extraction, and preprocessing |
+| **joblib** | Efficient model serialization and disk persistence |
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 Minor-project/
 │
-├── index.js                        # Express.js server (main entry point)
-├── package.json                    # Node.js dependencies & scripts
-├── README.md                       # This file
+├── main.py                         # 🚀 Unified FastAPI Server (Main Entry Point & Routes)
+├── requirements.txt                # Python backend dependencies
+├── nixpacks.toml                   # Cloud Deployment configuration (e.g., Railway)
+├── README.md                       # Documentation
 │
-├── views/                          # EJS templates (server-rendered pages)
-│   ├── in.ejs                      # Landing page template
-│   └── menu.ejs                    # Menu/dashboard template
+├── project_model/                  # 🤖 ML Models Directory
+│   ├── WaterDemandPrediction_Model/ # Contains water_model.pkl & columns.pkl
+│   ├── capacity_model/              # Contains chunked capacity_model.pkl.part* files
+│   └── sector_model/                # Contains sector_model.pkl
 │
-├── public/                         # Static assets served by Express
-│   ├── HTML_File/
-│   │   ├── index.html              # Landing page (static version)
-│   │   ├── menu.html               # Menu page (static version)
-│   │   ├── predict_water_demand.html    # Water demand prediction form
-│   │   ├── predict_capacity.html        # Reservoir capacity prediction form
-│   │   └── predict_sector_risk.html     # Sector risk assessment form
-│   │
-│   ├── CSS_File/
-│   │   ├── in.css                  # Landing page styles
-│   │   └── menu.css                # Menu page styles
-│   │
-│   └── JavaScript_File/
-│       ├── in.js                   # Landing page scripts (rain animation)
-│       └── menu.js                 # Menu page scripts (rain animation)
+├── public/                         # 🎨 Frontend Assets (Static Files)
+│   ├── HTML_File/                  # Core templates (index, menu, prediction pages)
+│   ├── CSS_File/                   # Stylesheets & themes
+│   └── JavaScript_File/            # Interactive scripts & API integration
 │
-└── project Model/                  # ML models directory
-    │
-    ├── WaterDemandPrediction_Model/     # 🔹 Water Demand Model
-    │   ├── app.py                       # Flask server (port 5000)
-    │   ├── model.ipynb                  # Jupyter notebook (training)
-    │   ├── water_model.pkl              # Trained model file
-    │   ├── columns.pkl                  # Feature columns metadata
-    │   ├── mp_water_demand_4000_rows.csv # Training dataset
-    │   └── requirements.txt             # Python dependencies
-    │
-    ├── capacity_model/                  # 🔹 Reservoir Capacity Model
-    │   ├── server.py                    # Flask server (port 5002)
-    │   ├── capacity_model.pkl           # Trained model file
-    │   └── reservoir_capacity_dataset.csv # Training dataset
-    │
-    └── sector_model/                    # 🔹 Sector Risk Assessment Model
-        ├── server.py                    # Flask server (port 5001)
-        ├── app.py                       # Model training script
-        ├── app.ipynb                    # Jupyter notebook (training)
-        ├── sector_model.pkl             # Trained model file
-        └── newDataset_with_demand.csv   # Training dataset
+└── scratch/                        # 🛠️ Utility scripts (e.g., model splitting tools)
 ```
 
 ---
 
-## 🤖 ML Models Overview
+## 🤖 Machine Learning Models Details
 
-### 1. Water Demand Prediction Model (`port 5000`)
+### 1. Water Demand Prediction Model
 - **Algorithm:** Random Forest Regressor
-- **Input Features:** Temperature, Rainfall, Population, Reservoir Level, Water Tariff, Holiday flag, Previous Day Demand (lag_1), Last Week Demand (lag_7), City, Season
-- **Output:** Predicted water demand (in units)
-- **Endpoint:** `POST /predict`
+- **Purpose:** Estimates the total volume of water required by a specific city.
+- **Key Inputs:** Temperature, Rainfall, Population, Reservoir Level, Water Tariff, Holiday status, historical lags (lag_1, lag_7), City, and Season.
 
-### 2. Reservoir Capacity Prediction Model (`port 5002`)
-- **Algorithm:** Random Forest Regressor (100 estimators)
-- **Input Features:** Rainfall (mm), Inflow (cumecs), Outflow (cumecs), Runoff Factor
-- **Output:** Predicted capacity percentage (0–100%)
-- **Endpoint:** `POST /predict_capacity`
+### 2. Reservoir Capacity Prediction Model
+- **Algorithm:** Random Forest Regressor
+- **Purpose:** Forecasts the percentage fill-level of a water reservoir.
+- **Technical Note:** Because the raw model size exceeds 268MB, it is split into `.part` chunks. The backend automatically recombines these parts in memory upon server startup.
+- **Key Inputs:** Rainfall (mm), Inflow (cumecs), Outflow (cumecs), and Runoff Factor.
 
-### 3. Sector-Wise Risk Assessment Model (`port 5001`)
-- **Algorithm:** Random Forest Regressor (100 estimators)
-- **Input Features:** Population, Capacity, Inflow, Outflow, Reservoir Level
-- **Output:** Predicted water demand, Risk Level (Low/Medium/High), Risk Ratio
-- **Risk Classification:**
-  - `Risk Ratio > 0.8` → **High Risk** 🔴
-  - `Risk Ratio > 0.5` → **Medium Risk** 🟠
-  - `Risk Ratio ≤ 0.5` → **Low Risk** 🟢
-- **Endpoint:** `POST /predict_risk`
+### 3. Sector-Wise Risk Assessment Model
+- **Algorithm:** Random Forest Regressor
+- **Purpose:** Calculates the supply-to-demand ratio to evaluate risk.
+- **Risk Logic:** 
+  - Risk Ratio > 0.8 ➡️ **High Risk**
+  - Risk Ratio > 0.5 ➡️ **Medium Risk**
+  - Otherwise ➡️ **Low Risk**
+- **Key Inputs:** Population, Max Capacity, Inflow, Outflow, and Current Reservoir Level.
 
 ---
 
-## ✅ Prerequisites
+## 🚀 How to Access & Run Locally
 
-Before running the project, ensure you have the following installed:
+Follow these detailed steps to set up and run the Aqua Forecast system on your local machine.
 
-| Software | Version | Download Link |
-|---|---|---|
-| **Node.js** | v18+ recommended | [nodejs.org](https://nodejs.org/) |
-| **Python** | 3.8+ | [python.org](https://www.python.org/) |
-| **pip** | Latest | Comes with Python |
-| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
+### Step 1: Prerequisites
+Ensure you have the following installed on your system:
+- **Python 3.8 or higher** (Check by running `python --version` in your terminal)
+- **Git** (For cloning the repository)
 
----
-
-## 🚀 Installation & Setup
-
-### Step 1: Clone the Repository
-
+### Step 2: Clone the Repository
+Open your terminal or command prompt and run:
 ```bash
-git clone <repository-url>
+git clone <your-repository-url>
 cd Minor-project
 ```
 
-### Step 2: Install Node.js Dependencies
-
+### Step 3: Create a Virtual Environment (Recommended)
+It is highly recommended to use a virtual environment to isolate project dependencies.
 ```bash
-npm install
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-This installs the following packages:
-- `express` — Web framework
-- `ejs` — Templating engine
-
-### Step 3: Install Python Dependencies
-
-Install the required Python packages for **all three ML models**:
-
+### Step 4: Install Dependencies
+Install all required Python packages listed in the requirements file:
 ```bash
-pip install flask flask-cors pandas scikit-learn joblib numpy
+pip install -r requirements.txt
 ```
 
-Or, using the provided requirements file:
-
+### Step 5: Start the Server
+Launch the FastAPI server using Uvicorn (handled directly inside `main.py`):
 ```bash
-pip install -r "project Model/WaterDemandPrediction_Model/requirements.txt"
+python main.py
 ```
 
-> **Note:** The `sector_model/app.py` training script also uses `matplotlib` and `seaborn` for visualizations. Install them if you plan to retrain:
-> ```bash
-> pip install matplotlib seaborn
-> ```
-
----
-
-## ▶️ Running the Application
-
-You need to start **4 servers** in separate terminals — 1 Node.js frontend server + 3 Flask ML backend servers.
-
-### Terminal 1 — Start the Web Server (Node.js)
-
-```bash
-cd Minor-project
-npm run dev
-```
-
-> This starts the Express server at **http://localhost:3000** with auto-restart on file changes.
->
-> Alternatively, for production:
-> ```bash
-> npm start
-> ```
-
-### Terminal 2 — Start the Water Demand Model (Flask, Port 5000)
-
-```bash
-cd "project Model/WaterDemandPrediction_Model"
-python app.py
-```
-
-> Starts at **http://127.0.0.1:5000**
-
-### Terminal 3 — Start the Sector Risk Model (Flask, Port 5001)
-
-```bash
-cd "project Model/sector_model"
-python server.py
-```
-
-> Starts at **http://127.0.0.1:5001**
->
-> ⚠️ **Important:** Run `server.py` (not `app.py`). The `app.py` file is the training script, not the API server.
-
-### Terminal 4 — Start the Capacity Model (Flask, Port 5002)
-
-```bash
-cd "project Model/capacity_model"
-python server.py
-```
-
-> Starts at **http://127.0.0.1:5002**
-
-### Quick Start (All-in-One Summary)
-
-| Terminal | Command | Directory | Port |
-|---|---|---|---|
-| 1 | `npm run dev` | `Minor-project/` | 3000 |
-| 2 | `python app.py` | `project Model/WaterDemandPrediction_Model/` | 5000 |
-| 3 | `python server.py` | `project Model/sector_model/` | 5001 |
-| 4 | `python server.py` | `project Model/capacity_model/` | 5002 |
+### Step 6: Access the Application
+Once the server indicates it is running (you should see `Uvicorn running on http://0.0.0.0:8080`), open your preferred web browser and navigate to:
+**👉 http://localhost:8080**
 
 ---
 
 ## 📘 Usage Guide
 
-### 1. Open the Application
-Navigate to **http://localhost:3000** in your browser.
+### 1. The Landing Page
+When you access the application, you will be greeted by the **"Welcome to Aqua Forecast"** landing screen, complete with ocean-themed aesthetics and dynamic rain effects. 
+- Click the **"Explore Aqua Forecast"** button to enter the main dashboard.
 
-### 2. Landing Page
-You'll see the **"Welcome to Aqua Forecast"** hero section with a rain animation and ocean-themed background. Click **"Explore Aqua Forecast"** to proceed.
+### 2. The Main Menu
+The dashboard presents you with three distinct prediction modules. Choose the tool that fits your current need:
+- **Predict Capacity:** If you need to know how full a reservoir will get based on upcoming weather and flow data.
+- **Predict Water Demand:** If you need to estimate how much water a city will consume based on seasonal and demographic factors.
+- **Predict Sector Wise Risk:** If you want to evaluate if a specific local sector is in danger of a water shortage.
 
-### 3. Menu / Dashboard
-The menu page presents three prediction cards:
+### 3. Making a Prediction
+1. Click on your chosen module card.
+2. You will be taken to a specialized form. Fill in **all** the required numerical and categorical fields (e.g., Temperature, Rainfall, City).
+3. Click the **"Predict"** or **"Assess Risk"** button at the bottom of the form.
+4. The frontend will communicate with the FastAPI backend, process your data through the ML models, and display the result instantly on your screen!
 
-| Card | Description | Requires |
-|---|---|---|
-| **Predict Capacity** | Predicts reservoir capacity percentage | Capacity model (port 5002) |
-| **Predict Water Demand** | Forecasts water demand in units | Water demand model (port 5000) |
-| **Predict Sector Wise Risk** | Assesses sector water risk level | Sector model (port 5001) |
-
-### 4. Making Predictions
-1. Click on any prediction card
-2. Fill in the required input fields
-3. Click the **Predict / Assess** button
-4. View the results displayed on the same page
-
-> ⚠️ If a Flask model server is not running, you'll see an error: **"Error connecting to prediction server."** — Make sure the corresponding Flask server is running.
+> ⚠️ **Note:** On the very first startup, the Capacity Model takes a few moments to stitch its chunks together. Please be patient if the first request takes a few extra seconds.
 
 ---
 
-## 🔗 API Endpoints
+## 🔗 API Documentation
 
-### Water Demand Prediction
-```http
-POST http://127.0.0.1:5000/predict
-Content-Type: application/json
+If you wish to integrate Aqua Forecast's predictions into another application, you can interact directly with the FastAPI endpoints.
 
+### 1. Water Demand Prediction
+- **Endpoint:** `POST /predict_water`
+- **Headers:** `Content-Type: application/json`
+- **Body Example:**
+```json
 {
-  "Temperature": 35,
-  "Rainfall": 10,
-  "Population": 2000000,
-  "Reservoir_Level": 75,
-  "Water_Tariff": 15,
+  "Temperature": 35.5,
+  "Rainfall": 12.0,
+  "Population": 2500000,
+  "Reservoir_Level": 70.5,
+  "Water_Tariff": 15.0,
   "Holiday": 0,
-  "lag_1": 500,
-  "lag_7": 480,
+  "lag_1": 510.0,
+  "lag_7": 490.0,
   "City": "Bhopal",
   "Season": "Summer"
 }
 ```
-**Response:**
+
+### 2. Reservoir Capacity Prediction
+- **Endpoint:** `POST /predict_capacity`
+- **Headers:** `Content-Type: application/json`
+- **Body Example:**
 ```json
-{ "prediction": 523 }
-```
-
-### Reservoir Capacity Prediction
-```http
-POST http://127.0.0.1:5002/predict_capacity
-Content-Type: application/json
-
 {
-  "Rainfall_mm": 150,
-  "Inflow_cumecs": 1200,
-  "Outflow_cumecs": 800,
-  "Runoff_Factor": 0.4
+  "Rainfall_mm": 150.0,
+  "Inflow_cumecs": 1200.5,
+  "Outflow_cumecs": 800.0,
+  "Runoff_Factor": 0.45
 }
 ```
-**Response:**
+
+### 3. Sector Risk Assessment
+- **Endpoint:** `POST /predict_sector`
+- **Headers:** `Content-Type: application/json`
+- **Body Example:**
 ```json
-{ "predicted_capacity_percentage": 72.35 }
-```
-
-### Sector Risk Assessment
-```http
-POST http://127.0.0.1:5001/predict_risk
-Content-Type: application/json
-
 {
   "population": 500000,
   "capacity": 1000,
-  "inflow": 50,
-  "outflow": 40,
-  "reservoirlevel": 60
+  "inflow": 55,
+  "outflow": 42,
+  "reservoirlevel": 65
 }
 ```
-**Response:**
-```json
-{
-  "predicted_demand": 1234.56,
-  "risk_level": "Medium Risk",
-  "risk_ratio": 0.65
-}
-```
+
 ---
 
 ## 🔧 Troubleshooting
 
-| Issue | Solution |
-|---|---|
-| `npm error Missing script: "start"` | Run `npm run dev` instead, or ensure `package.json` has a `start` script |
-| `ModuleNotFoundError: No module named 'flask'` | Run `pip install flask flask-cors` |
-| `ModuleNotFoundError: No module named 'seaborn'` | Run `pip install seaborn` (only needed for `app.py` training script) |
-| `Error connecting to prediction server` | Ensure the corresponding Flask server is running on the correct port |
-| Port already in use | Kill the process using the port or change the port in the Flask server file |
-| `node --watch` not working | Upgrade Node.js to v18+ (the `--watch` flag requires Node 18+) |
+| Issue | Potential Cause | Solution |
+|---|---|---|
+| **Model files not found on startup** | Repository was cloned without LFS or chunks are missing. | Ensure you pulled the repository completely. Verify that `capacity_model` contains `.part` files. |
+| **`ModuleNotFoundError: No module named 'fastapi'`** | Dependencies are not installed. | Run `pip install -r requirements.txt` within your active virtual environment. |
+| **Port 8080 already in use** | Another application is using the port. | Change the port in `main.py` at the bottom (`os.environ.get("PORT", 8080)`) or kill the conflicting process. |
+| **"Error connecting to prediction server" on UI** | The frontend is trying to reach a different port. | Ensure you are accessing the UI via the FastAPI server (`http://localhost:8080`) rather than directly opening the HTML file from your file explorer. |
 
 ---
 
 ## 👥 Team
-Prayagi sahajwani,Sanskrati Kachole, Sheetal narwariya, Sejal Soni
+
+This project was brought to life by the following members:
+- **Prayagi Sahajwani**
+- **Sanskrati Kachole**
+- **Sheetal Narwariya**
+- **Sejal Soni**
+
 **Minor Project — Aqua Forecast**
